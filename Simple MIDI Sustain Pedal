@@ -1,0 +1,34 @@
+ int controller = 176;
+ int sustain = 64; //64 is the CC for Sustain
+ int susPin = 3; //The pin that you've soldered to (in our case, D3)
+
+ int susVal = 0; 
+ int susValDiff;
+ int lastSusVal;
+ int diff = 4;
+ 
+void setup() {
+  //  Set MIDI baud rate:
+  Serial.begin(31250);
+  pinMode(susPin, INPUT_PULLUP);
+}
+
+void loop(){
+
+    susVal = digitalRead(susPin); //reads sus pedal input    
+    
+    //This code makes sure the pedal only sends a signal when there is a change, rather than constantly
+    if(susVal != lastSusVal){
+    MIDImessage(controller, sustain, 127*susVal); 
+    lastSusVal = susVal;
+    } 
+    
+    delay(2);
+}
+
+//MIDI message command
+void MIDImessage(int command, int MIDInote, int MIDIvelocity) {
+  Serial.write(command); 
+  Serial.write(MIDInote);//sends the CC (in our case the CC is 64, which is sustain)
+  Serial.write(MIDIvelocity);//sends a number between 0 and 127 (pedal on/off)
+}
